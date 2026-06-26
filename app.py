@@ -18,7 +18,7 @@ from datetime import datetime
 
 # ================= RESEND CONFIG =================
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
-ADMIN_EMAIL    = "ugale.ganesh.d@gmail.com"
+ADMIN_EMAIL    = "fulsundardevan@gmail.com"
 
 # Initialize Flask app
 app = Flask(__name__)

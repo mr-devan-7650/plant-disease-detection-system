@@ -613,7 +613,7 @@ def health():
     try:
         import requests as req
         resp = req.get(
-            'https://ganeshugale47-plant-leaf-disease-detector.hf.space/',
+            'https://devan47-plant-leaf-disease-detector.hf.space/',
             timeout=8
         )
         hf_reachable = resp.status_code in [200, 302, 401, 403]

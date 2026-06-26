@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Detection System</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-leaf"></i>
+                    <h1>Plant Disease Detection</h1>
+                </div>
+                <button class="nav-toggle" id="navToggle" onclick="toggleNav()" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+                <nav class="nav" id="mainNav">
+                    <a href="#home" class="nav-link active">Home</a>
+                    <a href="#about" class="nav-link">About</a>
+                    <a href="#history" class="nav-link">History</a>
+                    <a href="/contact" class="nav-link">Contact</a>
+                    <a href="/login" id="navLoginBtn" style="background:linear-gradient(135deg,#10b981,#059669);color:white;padding:0.5rem 1.25rem;border-radius:9999px;font-weight:600;text-decoration:none;font-size:0.88rem"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    <a href="/admin" id="navAdminBtn" style="display:none;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:white;padding:0.5rem 1.25rem;border-radius:9999px;font-weight:600;text-decoration:none;font-size:0.88rem"><i class="fas fa-shield-alt"></i> Admin</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h2 class="hero-title">Detect Plant Diseases Instantly</h2>
+                    <p class="hero-subtitle">Upload a leaf image and get AI-powered diagnosis with treatment recommendations</p>
+                    <div class="hero-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-seedling"></i>
+                            <div>
+                                <h3>38+</h3>
+                                <p>Disease Types</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-brain"></i>
+                            <div>
+                                <h3>94%+</h3>
+                                <p>Accuracy</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-bolt"></i>
+                            <div>
+                                <h3>Real-time</h3>
+                                <p>Detection</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Upload Section -->
+    <section class="upload-section">
+        <div class="container">
+            <div class="upload-container">
+                <!-- Upload Area -->
+                <div class="upload-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Upload Plant Leaf Image
+                    </h2>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <i class="fas fa-image upload-icon"></i>
+                            <h3>Drag & Drop your image here</h3>
+                            <p>or</p>
+                            <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:0.5rem">
+                                <label for="fileInput" class="btn btn-primary">
+                                    <i class="fas fa-folder-open"></i>
+                                    Browse Files
+                                </label>
+                                <button type="button" class="btn btn-success" id="cameraBtn" onclick="openCamera()">
+                                    <i class="fas fa-camera"></i>
+                                    Use Camera
+                                </button>
+                            </div>
+                            <input type="file" id="fileInput" accept="image/*" hidden>
+                            <p class="upload-hint">Supported formats: JPG, PNG, JPEG (Max 16MB)</p>
+                        </div>
+
+                        <!-- Camera Modal -->
+                        <div id="cameraModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+                            <div style="background:white;border-radius:1.5rem;padding:1.5rem;max-width:520px;width:94%;box-shadow:0 30px 80px rgba(0,0,0,0.4);font-family:Poppins,sans-serif;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                                    <h3 style="margin:0;color:#1f2937;font-size:1.1rem;"><i class="fas fa-camera" style="color:#10b981;margin-right:0.5rem"></i>Take a Photo</h3>
+                                    <button onclick="closeCamera()" style="background:#f3f4f6;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;color:#6b7280;">✕</button>
+                                </div>
+
+                                <!-- Live camera feed -->
+                                <div style="position:relative;border-radius:1rem;overflow:hidden;background:#000;aspect-ratio:4/3;">
+                                    <video id="cameraVideo" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+                                    <!-- Leaf guide overlay -->
+                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+                                        <div style="width:70%;height:70%;border:3px dashed rgba(16,185,129,0.8);border-radius:1rem;display:flex;align-items:center;justify-content:center;">
+                                            <span style="color:rgba(255,255,255,0.7);font-size:0.75rem;background:rgba(0,0,0,0.4);padding:0.25rem 0.75rem;border-radius:9999px;">Place leaf here</span>
+                                        </div>
+                                    </div>
+                                    <!-- Flash effect -->
+                                    <div id="cameraFlash" style="position:absolute;inset:0;background:white;opacity:0;pointer-events:none;transition:opacity 0.1s;"></div>
+                                </div>
+
+                                <!-- Canvas (hidden) for capturing -->
+                                <canvas id="cameraCanvas" style="display:none;"></canvas>
+
+                                <!-- Camera controls -->
+                                <div style="display:flex;gap:0.75rem;margin-top:1.25rem;justify-content:center;align-items:center;">
+                                    <button onclick="switchCamera()" id="switchCamBtn" style="background:#f3f4f6;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:1.1rem;color:#374151;" title="Switch Camera">🔄</button>
+                                    <button onclick="capturePhoto()" style="background:linear-gradient(135deg,#10b981,#059669);border:none;width:68px;height:68px;border-radius:50%;cursor:pointer;font-size:1.6rem;box-shadow:0 6px 20px rgba(16,185,129,0.4);transition:transform 0.1s;" onmousedown="this.style.transform='scale(0.93)'" onmouseup="this.style.transform='scale(1)'">📸</button>
+                                    <button onclick="closeCamera()" style="background:#fee2e2;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:1.1rem;color:#ef4444;" title="Close">✕</button>
+                                </div>
+                                <p style="text-align:center;color:#9ca3af;font-size:0.78rem;margin:0.75rem 0 0;">Photo will be validated before uploading</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Image Preview -->
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImage" src="" alt="Preview">
+                            <button class="btn-remove" id="removeImage">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-success btn-large" id="predictBtn" style="display: none;">
+                        <i class="fas fa-magic"></i>
+                        Analyze Disease
+                    </button>
+                    
+                    <!-- Loading Spinner -->
+                    <div class="loading" id="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Analyzing your plant...</p>
+                    </div>
+                </div>
+
+                <!-- Results Area -->
+                <div class="results-card" id="resultsCard" style="display: none;">
+                    <h2 class="section-title">
+                        <i class="fas fa-check-circle"></i>
+                        Detection Results
+                    </h2>
+                    
+                    <div class="result-content">
+                        <!-- Main Result -->
+                        <div class="main-result">
+                            <div class="result-header">
+                                <h3>Detected Disease</h3>
+                                <span class="confidence-badge" id="confidenceBadge">0%</span>
+                            </div>
+                            <h2 class="disease-name" id="diseaseName">-</h2>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidenceFill"></div>
+                            </div>
+                        </div>
+
+                        <!-- Disease Information -->
+                        <div class="disease-info">
+                            <div class="info-card">
+                                <h4><i class="fas fa-info-circle"></i> Description</h4>
+                                <p id="diseaseDescription">-</p>
+                            </div>
+                            <div class="info-card">
+                                <h4><i class="fas fa-medkit"></i> Treatment</h4>
+                                <p id="diseaseTreatment">-</p>
+                            </div>
+                            <div class="info-card">
+                                <h4><i class="fas fa-shield-alt"></i> Prevention</h4>
+                                <p id="diseasePrevention">-</p>
+                            </div>
+                        </div>
+
+                        <!-- Top 3 Predictions -->
+                        <div class="top-predictions">
+                            <h4><i class="fas fa-list-ol"></i> Top 3 Predictions</h4>
+                            <div class="predictions-list" id="topPredictions">
+                                <!-- Will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="result-actions">
+                            <button class="btn btn-primary" id="newPrediction">
+                                <i class="fas fa-redo"></i>
+                                New Analysis
+                            </button>
+                            <button class="btn btn-outline" id="downloadReport">
+                                <i class="fas fa-download"></i>
+                                Download Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <h2 class="section-title-center">About This System</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <i class="fas fa-microscope"></i>
+                    <h3>Deep Learning Powered</h3>
+                    <p>Uses state-of-the-art EfficientNetB3 architecture trained on 87,000+ plant images</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-leaf"></i>
+                    <h3>38 Disease Types</h3>
+                    <p>Detects diseases across 14 different plant species including tomato, potato, apple, and more</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>High Accuracy</h3>
+                    <p>Achieves 94%+ accuracy on validation data with real-time predictions</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Easy to Use</h3>
+                    <p>Simply upload an image and get instant diagnosis with treatment recommendations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Section -->
+    <section class="history-section" id="history">
+        <div class="container">
+            <div class="history-header">
+                <h2 class="section-title-center">Prediction History</h2>
+            
+                <!-- ✅ NEW DATE FILTER -->
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap:wrap;">
+                    <div style="position:relative;display:inline-block;">
+                        <input type="date" id="historyDate" class="btn btn-outline" style="color:#1f2937;background:white;-webkit-text-fill-color:#1f2937;color-scheme:light;min-width:160px;" oninput="this.setAttribute('data-has-value', this.value ? '1' : '')">
+                        <span id="datePlaceholder" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#6b7280;font-size:0.9rem;pointer-events:none;font-family:Poppins,sans-serif;display:none;">📅 Select Date</span>
+                    </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="filterByDate()">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+            
+                    <button class="btn btn-outline" id="clearHistory">
+                        <i class="fas fa-trash"></i>
+                        Clear History
+                    </button>
+                </div>
+            </div>
+            <div class="history-grid" id="historyGrid">
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <p>No predictions yet. Upload an image to get started!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Plant Disease Detection System | BE Computer Engineering Project</p>
+            <p>Powered by Deep Learning & TensorFlow</p>
+        </div>
+    </footer>
+
+    <!-- TensorFlow.js + MobileNet for image validation -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- Firebase Auth Check for Nav -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPFEYMziCCCyr4FBod_Nhz82os_9XXaA8",
+            authDomain: "plant-disease-history.firebaseapp.com",
+            databaseURL: "https://plant-disease-history-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "plant-disease-history",
+            storageBucket: "plant-disease-history.firebasestorage.app",
+            messagingSenderId: "450353943942",
+            appId: "1:450353943942:web:ca6e6a35fa7d2b1a214807"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            const loginBtn = document.getElementById("navLoginBtn");
+            const adminBtn = document.getElementById("navAdminBtn");
+
+            if (user) {
+                // Show logout instead of login
+                loginBtn.textContent = user.displayName || user.email.split("@")[0];
+                loginBtn.innerHTML = "<i class='fas fa-user'></i> " + (user.displayName || user.email.split("@")[0]) + " <span onclick='doLogout(event)' style='margin-left:6px;background:rgba(0,0,0,0.2);border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer'>✕</span>";
+                loginBtn.href = "#";
+
+                // Check admin role
+                const snap = await get(ref(db, "users/" + user.uid));
+                if (snap.val()?.role === "admin") {
+                    adminBtn.style.display = "inline-flex";
+                    adminBtn.style.alignItems = "center";
+                    adminBtn.style.gap = "0.4rem";
+                }
+            }
+        });
+
+        window.doLogout = async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            await signOut(auth);
+            window.location.reload();
+        };
+    </script>
+    <script>
+        function toggleNav() {
+            document.getElementById('mainNav').classList.toggle('open');
+        }
+        document.querySelectorAll('.nav-link').forEach(function(link) {
+            link.addEventListener('click', function() {
+                document.getElementById('mainNav').classList.remove('open');
+            });
+        });
+
+        // Date placeholder show/hide (mobile only)
+        var dateInput = document.getElementById('historyDate');
+        var datePlaceholder = document.getElementById('datePlaceholder');
+        function isMobile() { return window.innerWidth <= 768; }
+        function updatePlaceholder() {
+            if (datePlaceholder) {
+                datePlaceholder.style.display = (isMobile() && !dateInput.value) ? 'block' : 'none';
+            }
+        }
+        if (dateInput && datePlaceholder) {
+            dateInput.addEventListener('change', updatePlaceholder);
+            window.addEventListener('resize', updatePlaceholder);
+            updatePlaceholder();
+        }
+    </script>
+
+    <!-- Firebase Auth Guard -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPFEYMziCCCyr4FBod_Nhz82os_9XXaA8",
+            authDomain: "plant-disease-history.firebaseapp.com",
+            databaseURL: "https://plant-disease-history-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "plant-disease-history",
+            storageBucket: "plant-disease-history.firebasestorage.app",
+            messagingSenderId: "450353943942",
+            appId: "1:450353943942:web:ca6e6a35fa7d2b1a214807"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Hide page until auth check completes
+        document.body.style.visibility = 'hidden';
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = '/login';
+            } else {
+                document.body.style.visibility = 'visible';
+            }
+        });
+    </script>
+</body>
+</html>

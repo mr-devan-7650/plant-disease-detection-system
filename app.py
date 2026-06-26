@@ -28,7 +28,7 @@ firebase_key = json.loads(os.environ.get("FIREBASE_KEY"))
 cred = credentials.Certificate(firebase_key)
 
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://plant-disease-history-default-rtdb.asia-southeast1.firebasedatabase.app'
+    'databaseURL': 'https://plant-disease-history-6112d-default-rtdb.asia-southeast1.firebasedatabase.app'
 })
 
 # Create uploads folder if not exists

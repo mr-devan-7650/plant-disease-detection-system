@@ -46,7 +46,7 @@ app.config['ALLOWED_EXTENSIONS'] = {
 }
 
 # Hugging Face Space client
-hf_client = Client("ganeshugale47/plant-leaf-disease-detector")
+hf_client = Client("devan47/plant-leaf-disease-detector")
 
 # Global variables
 prediction_history = []
